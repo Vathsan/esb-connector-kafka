@@ -37,7 +37,7 @@ public class KafkaConnection {
      * @param messageContext the message context.
      * @return the producer
      */
-    public KafkaProducer<String, String> createNewConnection(MessageContext messageContext) {
+    public KafkaProducer<Object, Object> createNewConnection(MessageContext messageContext) {
         Axis2MessageContext axis2mc = (Axis2MessageContext) messageContext;
         String brokers = (String) axis2mc.getAxis2MessageContext()
                 .getProperty(KafkaConnectConstants.KAFKA_BROKER_LIST);
@@ -45,6 +45,8 @@ public class KafkaConnection {
                 .getProperty(KafkaConnectConstants.KAFKA_KEY_SERIALIZER_CLASS);
         String valueSerializationClass = (String) messageContext
                 .getProperty(KafkaConnectConstants.KAFKA_VALUE_SERIALIZER_CLASS);
+        String schemaRegistryUrl = (String) messageContext
+                .getProperty(KafkaConnectConstants.KAFKA_SCHEMA_REGISTRY_URL);
         String ack = (String) messageContext.getProperty(KafkaConnectConstants.KAFKA_ACKS);
         String bufferMemory = (String) messageContext.getProperty(KafkaConnectConstants.KAFKA_BUFFER_MEMORY);
         String compressionCodec = (String) messageContext
@@ -139,6 +141,9 @@ public class KafkaConnection {
         producerConfigProperties.put(KafkaConnectConstants.COMPRESSION_TYPE, compressionCodec);
         producerConfigProperties.put(KafkaConnectConstants.RETRIES, retries);
 
+        if (StringUtils.isNotEmpty(schemaRegistryUrl)) {
+            producerConfigProperties.put(KafkaConnectConstants.SCHEMA_REGISTRY_URL, schemaRegistryUrl);
+        }
         if (StringUtils.isNotEmpty(sslKeyPassword)) {
             producerConfigProperties.put(KafkaConnectConstants.SSL_KEY_PASSWORD, sslKeyPassword);
         }
